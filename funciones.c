@@ -13,13 +13,24 @@ void descriptorGlobal(char *nombre)
     archivoEntradaGlobal = nombre;
 }
 
+// Entradas: Recibe la variable Chunk necesaria para la lectura de líneas
+// Salidas: no considera
+// Descripción: Se emplea un ciclo while por cada hebra estableciendo su correspondiente...
+//              ...entrada y salida de la sección crítica (mutex) de modo que, primeramente...
+//              ...obtenemos el largo del archivo de entrada, necesario para establecer la...
+//              ...condición de salida del ciclo mencionado anteriormente una vez se lee todo...
+//              ...su contenido. En este sentido, se posee una variable global auxiliar que...
+//              ...permite mantener constancia de la líneas leídas y en consecuencia, por leer...
+//              ...de modo que mediante una lista enlazada compartida/global ingresamos los...
+//              ...correspondiente datos de los juegos de acuerdo a su respectivo año...
+//              ...insertandole si no existe y comparando en caso contrario (y actualizando)
 void calculos(void *param)
 {
     // Funciones que realicen los calculos necesarios
     while (true)
     {
 
-        pthread_mutex_lock(&mutex);
+        pthread_mutex_lock(&mutex); // ENTERSC
         // SC
         int chunkAux = atoi(param);
         int fgetsAux = 0;
@@ -110,9 +121,6 @@ void calculos(void *param)
                     token = strtok(NULL, ","); // Se continua al siguiente elemento
                     posicionAct++;             // Aumenta la posición del elemento
                 }
-
-                /////////////
-                // printf("nombre juego: %s\nprecio: %f\nanio: %d\ncontadorW: %d\ncontadorMac: %d\ncontadorL: %d\njeugos gratis: %s\n", nombreJuego, precioJuego, anio, contadorW, contadorMAC, contadorL, esGratis);
                 //  Si es lista enlazada es vacia, agrega la información obtenida
                 if (esListaVacia(listaCompartida))
                 {
@@ -146,8 +154,6 @@ void calculos(void *param)
                                        esGratis);
                     }
                 }
-                /////////////
-
                 contadorLineasGlobal++;
                 chunkAux--;
             }
@@ -158,15 +164,17 @@ void calculos(void *param)
             pthread_mutex_unlock(&mutex);
             pthread_exit((void *)THREAD_SUCCESS);
         }
-
         fclose(dctoEntrada);
-
-
-        pthread_mutex_unlock(&mutex);
+        pthread_mutex_unlock(&mutex); // EXITSC()
     }
 }
 
-
+// Entradas: Valor número (0 o 1 como booleanos) que indican el ingreso (o no) de parámetros
+// Salidas: No posee salida, sin embargo, la función finaliza sin problemas siempre y cuando...
+//          ...se ingresen los parámetros minimos obligatorios (sin considerar bFlag)
+// Descripción: Se evalua el correcto ingreso de los parámetros necesarios para las operaciones...
+//              ...a realizar durante la ejecución de los procesos, en caso de faltar uno,...
+//              ...el proceso es abortado, caso contrario continua su ejecución
 void validacionArgsOPT(int iFlag, int oFlag, int dFlag, int pFlag, int nFlag, int cFlag, char *argv[])
 {
     if (iFlag == 0) // Si no existe el nombre del archivo de entrada

@@ -4,7 +4,6 @@ extern TDAlista* listaCompartida;
 
 int main(int argc, char *argv[])
 {
-    /************************************ Lógica de solución - punto 1 ************************************/
     char *nombreArchivoEntrada, *nombreArchivoSalida, *anioInicioJuego, *precioMinimoJuego, *cantidadHebras, *tamanioChunk;
     int iFlag = 0, oFlag = 0, dFlag = 0, pFlag = 0, nFlag = 0, cFlag = 0, bFlag = 0;
     int opt, err;
@@ -55,7 +54,7 @@ int main(int argc, char *argv[])
         exit(-1);
     }
 
-
+    // Creación y llamado de hebras
     pthread_t threads[atoi(cantidadHebras)];
     int status;
     for (int i = 0; i < atoi(cantidadHebras); i++)
@@ -70,18 +69,18 @@ int main(int argc, char *argv[])
     // Promedio de precios y porcentajes
     listaCompartida = actualizarPorcentajes(listaCompartida);
 
+    // bFlag
     if (bFlag == 1)
     {
         recorrerLista(listaCompartida, atoi(anioInicioJuego));
     }
 
+    // Creación archivo de salida
     FILE * archivoSalida; 
     archivoSalida = fopen(nombreArchivoSalida, "w"); // Se crea el archivo de salida dado el nombre ingresado por pantalla desde lab2.c
     imprimirEnFlujoDesdeAnio(listaCompartida, archivoSalida, atoi(anioInicioJuego)); // Se imprimen los resultados obtenidos en el flujo
     fclose(archivoSalida); // Se cierra el archivo
             
-
     fclose(dctoEntrada);
-
     return 0;
 }
