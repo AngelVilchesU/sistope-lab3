@@ -5,6 +5,32 @@
 #include <pthread.h>
 #include <stdbool.h>
 #define LARGO_CHAR 300
+
+typedef struct nodoGenerico
+{
+    int anio;
+    float precioMasCaro;
+    float precioMasBarato;
+    char nombreJuegoMasCaro[LARGO_CHAR];
+    char nombreJuegoMasBarato[LARGO_CHAR];
+    int contadorJuegos;
+    float sumaTotalJuegos;
+    float promedioPrecioJuegos;
+    int contadorW;
+    int contadorMC;
+    int contadorL;
+    float porcentajeW;
+    float porcentajeMC;
+    float porcentajeL;
+    char juegosGratis[LARGO_CHAR];
+    struct nodoGenerico *siguiente;
+} nodo;
+
+typedef struct listaGenerica
+{
+    nodo *inicio;
+} TDAlista;
+
 char *archivoEntradaGlobal;
 enum
 {
@@ -16,12 +42,12 @@ int contadorLineasGlobal = 0;
 
 void calculos(void *param)
 {
-    printf("Hola soy una hebra\n");
     // Funciones que realicen los calculos necesarios
     while (true)
     {
-        printf("EnterSC\n");
+        
         pthread_mutex_lock(&mutex);
+        printf("<<<EnterSC>>>\n");
         // SC
         int chunkAux = atoi(param);
         int fgetsAux = 0;
@@ -31,6 +57,7 @@ void calculos(void *param)
         {
             if (fgetsAux == contadorLineasGlobal)
             {
+                printf("linea: %s", linea);
                 contadorLineasGlobal++;
                 fgetsAux++;
             }
@@ -40,14 +67,14 @@ void calculos(void *param)
             }
             
             chunkAux--;
-            contadorLineasGlobal++;
         }
         fclose(dctoEntrada);
 
         printf("contadorLineasGlobal: %d\n", contadorLineasGlobal);
         
-        pthread_mutex_unlock(&mutex);
         printf("ExitSC\n");
+        pthread_mutex_unlock(&mutex);
+        
         break;
     }
 
