@@ -1,18 +1,6 @@
 #include "funciones.h"
 
-char *archivoEntradaGlobal;
-enum
-{
-    THREAD_FAIL,
-    THREAD_SUCCESS
-};
-pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-int contadorLineasGlobal = 0;
-
-void descriptorGlobal(char *nombre)
-{
-    archivoEntradaGlobal = nombre;
-}
+extern TDAlista* listaCompartida;
 
 int main(int argc, char *argv[])
 {
@@ -57,18 +45,15 @@ int main(int argc, char *argv[])
         }
     }
     validacionArgsOPT(iFlag, oFlag, dFlag, pFlag, nFlag, cFlag, argv); // Validación de los parámetros ingresados
-    printf("Nombre archivo entrada: %s\nNombre archivo salida: %s\nAnio inicio: %s\nPrecio minimo: %s\nCantidad hebras: %s\nTamanio Chunk: %s\nbFlag: %d\n", nombreArchivoEntrada, nombreArchivoSalida, anioInicioJuego, precioMinimoJuego, cantidadHebras, tamanioChunk, bFlag);
 
     descriptorGlobal(nombreArchivoEntrada);
-    printf("Descriptor global: %s\n", archivoEntradaGlobal);
 
-    FILE *dctoEntrada = fopen(archivoEntradaGlobal, "r");
+    FILE *dctoEntrada = fopen(nombreArchivoEntrada, "r");
     if (dctoEntrada == NULL)
     {
-        printf("%s: error in input file named\n", archivoEntradaGlobal);
+        printf("%s: error in input file named\n", nombreArchivoEntrada);
         exit(-1);
     }
-
 
 
     pthread_t threads[atoi(cantidadHebras)];
@@ -81,6 +66,20 @@ int main(int argc, char *argv[])
     {
         pthread_join(threads[i], (void **)&status);
     }
+
+    // Promedio de precios y porcentajes
+    listaCompartida = actualizarPorcentajes(listaCompartida);
+
+    if (bFlag == 1)
+    {
+        recorrerLista(listaCompartida, atoi(anioInicioJuego));
+    }
+
+    FILE * archivoSalida; 
+    archivoSalida = fopen(nombreArchivoSalida, "w"); // Se crea el archivo de salida dado el nombre ingresado por pantalla desde lab2.c
+    imprimirEnFlujoDesdeAnio(listaCompartida, archivoSalida, atoi(anioInicioJuego)); // Se imprimen los resultados obtenidos en el flujo
+    fclose(archivoSalida); // Se cierra el archivo
+            
 
     fclose(dctoEntrada);
 
