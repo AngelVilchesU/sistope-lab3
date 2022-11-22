@@ -86,3 +86,5 @@ float valorMenor(float , float );
 TDAlista *actualizarPorcentajes(TDAlista *);
 
 void imprimirEnFlujoDesdeAnio(TDAlista *, FILE *, int );
+
+void recorrerListaAll(TDAlista *);

@@ -54,10 +54,9 @@ void calculos(void *param)
                 }
 
                 int nroJuego = 1;
-                int anio;
-                float precioJuego;
+                int anio = 0;
+                float precioJuego = 0;
                 char nombreJuego[LARGO_CHAR] = "";
-                int contadorJuegos;
                 int contadorW = 0;
                 int contadorMAC = 0;
                 int contadorL = 0;
@@ -121,7 +120,7 @@ void calculos(void *param)
                     token = strtok(NULL, ","); // Se continua al siguiente elemento
                     posicionAct++;             // Aumenta la posición del elemento
                 }
-                //  Si es lista enlazada es vacia, agrega la información obtenida
+                //   Si es lista enlazada es vacia, agrega la información obtenida
                 if (esListaVacia(listaCompartida))
                 {
                     insertarInicio(listaCompartida, anio, precioJuego,
@@ -162,11 +161,12 @@ void calculos(void *param)
         if (lineasTotales == contadorLineasGlobal)
         {
             pthread_mutex_unlock(&mutex);
-            pthread_exit((void *)THREAD_SUCCESS);
+            break;
         }
         fclose(dctoEntrada);
         pthread_mutex_unlock(&mutex); // EXITSC()
     }
+    pthread_exit((void *)THREAD_SUCCESS);
 }
 
 // Entradas: Valor número (0 o 1 como booleanos) que indican el ingreso (o no) de parámetros
@@ -369,6 +369,7 @@ TDAlista *actualizarNodo(TDAlista *lista, int anio, float precioMasCaro,
 //              que coincida con el ingresado
 int aniosEquivalentes(TDAlista *lista, int anio)
 {
+
     if (!esListaVacia(lista)) // Si la lista no es vacia...
     {
         nodo *auxiliar = lista->inicio;
@@ -469,6 +470,25 @@ void imprimirEnFlujoDesdeAnio(TDAlista *lista_enlace, FILE *flujo, int anioBase)
                     aux->anio, aux->nombreJuegoMasCaro, aux->precioMasCaro, aux->nombreJuegoMasBarato, aux->precioMasBarato, aux->promedioPrecioJuegos,
                     aux->porcentajeW, aux->porcentajeMC, aux->porcentajeL, aux->juegosGratis);
         }
+
         aux = aux->siguiente;
     }
+}
+
+void recorrerListaAll(TDAlista *lista)
+{
+    if (!esListaVacia(lista)) // Si no es lista vacia
+    {
+        nodo *aux = lista->inicio;
+        while (aux != NULL) // Mientras no sea nulo
+        {
+            printf("Año %d:\nJuego mas caro: %s %f\nJuego mas barato: %s %f\nPromedio de precios: %f\nWindows: %f%% Mac: %f%% Linux: %f%%\nJuegos gratis:\n%s",
+                   aux->anio, aux->nombreJuegoMasCaro, aux->precioMasCaro, aux->nombreJuegoMasBarato, aux->precioMasBarato, aux->promedioPrecioJuegos,
+                   aux->porcentajeW, aux->porcentajeMC, aux->porcentajeL, aux->juegosGratis);
+
+            aux = aux->siguiente; // Siguiente nodo
+        }
+    }
+    else // Si es lista vacia
+        printf("La lista está vacía\n");
 }
